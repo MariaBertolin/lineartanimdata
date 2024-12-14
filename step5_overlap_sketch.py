@@ -1,11 +1,8 @@
 import matplotlib.pyplot as plt
-import shapely.geometry
 import cv2
 import numpy as np
-import util_contours
 import os
 import traceback
-import facial_landmarks
 import sys
 
 def removeBlackBackground(img):
