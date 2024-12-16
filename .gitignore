@@ -1,4 +1,5 @@
 .DS_Store
+/data_tmp
 /myvenv
 /weights
 /sam2/checkpoints/*.pt

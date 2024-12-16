@@ -30,38 +30,38 @@ pip install "numpy<1.24"
 
 ## test
 
-1) create dir data/scenes/disney_1 and place footage.mp4 there
+1) create dir data/scenes/SCENENAME and place footage.mp4 there (already done for the test scene)
 
 2) subsample
 
-	./subsample.sh $HOME/dev/lineartanimdata/data/scenes/disney_1 0
+	./subsample.sh $HOME/dev/lineartanimdata/data/scenes/test 0
 
 3) Speficy the segmentation settings in a file (already done for the test scene):
 
-	  data/scenes/disney_1/scene_segmentation_settings.py
+	  data/scenes/test/scene_segmentation_settings.py
 
 4) Segment with SAM2
 
-	python segment_latest.py data/scenes/disney_1
+	python segment_latest.py data/scenes/test
 
 5) Extract background
 
-	python step2_foreground.py data/scenes/disney_1 
+	python step2_foreground.py data/scenes/test 
 
 6) Color reduction
 
-	python step3_cluster_color.py data/scenes/disney_1 
+	python step3_cluster_color.py data/scenes/test 
 
 8) sketch:
 
-	python src/ruben.py --input $HOME/dev/lineartanimdata/data/scenes/disney_1
+	python src/ruben.py --input $HOME/dev/lineartanimdata/data/scenes/test
 
 9) cd $HOME/dev/lester2
-	python step5_overlap_sketch.py data/scenes/disney_1
+	python step5_overlap_sketch.py data/scenes/test
 
 ## test
 
-	python all.py data/scenes/disney_1 
+	python all.py data/scenes/test 
 
 ## test colab
 
