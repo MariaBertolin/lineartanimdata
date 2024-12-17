@@ -57,6 +57,7 @@ pip install "numpy<1.24"
 	python src/ruben.py --input $HOME/dev/lineartanimdata/data/scenes/test
 
 9) cd $HOME/dev/lester2
+	
 	python step5_overlap_sketch.py data/scenes/test
 
 ## test
