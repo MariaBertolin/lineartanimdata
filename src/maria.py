@@ -92,7 +92,7 @@ if __name__ == "__main__":
             x = torch.tensor(x).float()
             
             # Detect and refine lines
-            lines = detect_and_refine_lines(preprocessed)
+            lines = detect_and_refine_lines(x)
             
             # postprocess
             output = lines.cpu().detach().numpy()
