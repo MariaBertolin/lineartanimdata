@@ -30,7 +30,12 @@ def preprocess(img):
     ret = np.zeros((512, 512, 3), dtype=np.float)
     ret[0:h,0:w,0:c] = highpass
     return ret
-
+    
+def detect_and_refine_lines(img):
+    edges = cv2.Canny(img, threshold1=50, threshold2=150)
+    kernel = np.ones((3, 3), np.uint8)
+    dilated = cv2.dilate(edges, kernel, iterations=1)
+    return dilated
 
 def postprocess(pred, thresh=0.18, smooth=False):
     assert thresh <= 1.0 and thresh >= 0.0
@@ -86,18 +91,15 @@ if __name__ == "__main__":
             x = img.reshape(1, *img.shape).transpose(3, 0, 1, 2)
             x = torch.tensor(x).float()
             
-            # feed into the network
-            with torch.no_grad():
-                pred = model(x.to(device))
-            pred = pred.squeeze()
+            # Detect and refine lines
+            lines = detect_and_refine_lines(preprocessed)
             
             # postprocess
-            output = pred.cpu().detach().numpy()
+            output = lines.cpu().detach().numpy()
             output = postprocess(output, thresh=0.1, smooth=False) 
             output = output[:new_height, :new_width]
 
             #resize to original
             output = cv2.resize(output, (img_orig.shape[1], img_orig.shape[0]))
-            
             
             cv2.imwrite(os.path.join(outputpath, filename), output)
