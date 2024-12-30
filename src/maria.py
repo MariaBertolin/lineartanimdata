@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 import torch
 import cv2
-from model import SketchKeras
+# from model import SketchKeras
 import sys
 import os
 
@@ -11,12 +11,8 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", "-i", type=str, default="", help="input image file")
-    parser.add_argument(
-        "--output", "-o", type=str, default="output.jpg", help="output image file"
-    )
-    parser.add_argument(
-        "--weight", "-w", type=str, default="weights/model.pth", help="weight file"
-    )
+    parser.add_argument("--output", "-o", type=str, default="output.jpg", help="output image file")
+    # parser.add_argument("--weight", "-w", type=str, default="weights/model.pth", help="weight file")
     return parser.parse_args()
 
 
@@ -53,27 +49,19 @@ def postprocess(pred, thresh=0.18, smooth=False):
 if __name__ == "__main__":
     args = parse_args()
 
-    model = SketchKeras().to(device)
-
-    if len(args.weight) > 0:
-        model.load_state_dict(torch.load(args.weight))
-        print(f"{args.weight} loaded..")
-
     SCENE_PATH = args.input
 
-    inputpath = SCENE_PATH+"/out_clustercolor"
+    inputpath = SCENE_PATH + "/out_clustercolor"
     #inputpath = SCENE_PATH+"/out_foreground"
     #outputpath = SCENE_PATH+"/out_sketch_fromforeground/"
-    outputpath = SCENE_PATH+"/out_sketch_fromclustercolor/"
+    outputpath = SCENE_PATH + "/out_sketch_fromclustercolor/"
     
-    
-
     if not os.path.exists(outputpath):
        os.makedirs(outputpath)
 
     for filename in sorted(os.listdir(inputpath)):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif')):# and filename=="00066.png":
-            print("process("+inputpath+"/"+filename+", "+outputpath+")")
+            print("process(" + inputpath + "/" + filename + ", " + outputpath + ")")
             
             img_orig = cv2.imread(os.path.join(inputpath, filename))
             assert img_orig is not None, "file could not be read, check with os.path.exists()"
