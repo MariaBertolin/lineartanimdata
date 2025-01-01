@@ -20,23 +20,38 @@ def preprocess(img):
     h, w, c = img.shape
     blurred = cv2.GaussianBlur(img, (0, 0), 3)
     highpass = img.astype(int) - blurred.astype(int)
-    highpass = highpass.astype(np.float) / 128.0
+    highpass = highpass.astype(float) / 128.0
     highpass /= np.max(highpass)
 
-    ret = np.zeros((512, 512, 3), dtype=np.float)
+    ret = np.zeros((512, 512, 4), dtype=float)
     ret[0:h,0:w,0:c] = highpass
     return ret
     
 def detect_and_refine_lines(img):
-    edges = cv2.Canny(img, threshold1=50, threshold2=150)
-    kernel = np.ones((3, 3), np.uint8)
-    dilated = cv2.dilate(edges, kernel, iterations=1)
+    # Manejar transparencia si la imagen tiene un canal alfa
+    if img.shape[-1] == 4:  # Imagen con canal alfa
+        alpha_channel = img[:, :, 3]
+        img = cv2.cvtColor(img[:, :, :3], cv2.COLOR_BGR2GRAY)
+        img[alpha_channel == 0] = 255  # Zonas transparentes -> blanco
+    elif img.ndim == 3:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Aplicar detección de bordes
+    edges = cv2.Canny(img, threshold1=150, threshold2=250)  # Reducir los umbrales para más detalle
+
+    # Suavizar las líneas
+    kernel = np.ones((2, 2), np.uint8)  # Kernel más pequeño para menos grosor
+    dilated = cv2.dilate(edges, kernel, iterations=1)  # Mantener suavidad sin engrosar demasiado
+    smoothed = cv2.medianBlur(dilated, 5)  # Eliminar ruido
+
     return dilated
 
 def postprocess(pred, thresh=0.18, smooth=False):
     assert thresh <= 1.0 and thresh >= 0.0
+    # Verifica si pred tiene más dimensiones de las esperadas
+    if pred.ndim > 2:
+        pred = np.amax(pred, axis=0)  # Reduce a 2D tomando el máximo en el primer eje
 
-    pred = np.amax(pred, 0)
     pred[pred < thresh] = 0
     pred = 1 - pred
     pred *= 255
@@ -51,10 +66,10 @@ if __name__ == "__main__":
 
     SCENE_PATH = args.input
 
-    inputpath = SCENE_PATH + "/out_clustercolor"
+    inputpath = SCENE_PATH + "/out_clustercolor" 
     #inputpath = SCENE_PATH+"/out_foreground"
     #outputpath = SCENE_PATH+"/out_sketch_fromforeground/"
-    outputpath = SCENE_PATH + "/out_sketch_fromclustercolor/"
+    outputpath = SCENE_PATH + "/out_sketch_fromclustercolor/" 
     
     if not os.path.exists(outputpath):
        os.makedirs(outputpath)
@@ -63,7 +78,7 @@ if __name__ == "__main__":
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif')):# and filename=="00066.png":
             print("process(" + inputpath + "/" + filename + ", " + outputpath + ")")
             
-            img_orig = cv2.imread(os.path.join(inputpath, filename))
+            img_orig = cv2.imread(os.path.join(inputpath, filename), cv2.IMREAD_UNCHANGED)
             assert img_orig is not None, "file could not be read, check with os.path.exists()"
 
             # resize
@@ -76,16 +91,20 @@ if __name__ == "__main__":
             
             # preprocess
             img = preprocess(img)
-            x = img.reshape(1, *img.shape).transpose(3, 0, 1, 2)
-            x = torch.tensor(x).float()
+            img_np = img[:, :, :3]  # Extraer como NumPy array
+            img_np = (img_np * 255).astype(np.uint8)  # Escalar a rango válido
             
             # Detect and refine lines
-            lines = detect_and_refine_lines(x)
+            lines = detect_and_refine_lines(img_np)
             
             # postprocess
-            output = lines.cpu().detach().numpy()
-            output = postprocess(output, thresh=0.1, smooth=False) 
-            output = output[:new_height, :new_width]
+            output = postprocess(lines, thresh=0.1, smooth=False) 
+            
+            # Verifica que `output` sea 2D antes de indexarlo
+            if output.ndim == 2:
+                output = output[:new_height, :new_width]
+            else:
+                raise ValueError(f"Unexpected output dimensions: {output.shape}")
 
             #resize to original
             output = cv2.resize(output, (img_orig.shape[1], img_orig.shape[0]))
