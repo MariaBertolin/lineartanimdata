@@ -32,7 +32,7 @@ def detect_and_refine_lines(img): # no s'usa
         alpha_channel = img[:, :, 3] # create a mask of alpha == 0
         # img = cv2.cvtColor(img[:, :, :3], cv2.COLOR_BGR2GRAY) -> S'OBTENEN MILLORS RESULTATS AMB LA IMATGE ORIGINAL
         img[alpha_channel == 0] = 255  # Zones transparents -> blanc
-    else
+    else:
         raise ValueError('La imatge proporcionada no té canal alfa, no cumpleix amb el format requerit')
     # Detecció de bordes
     img = cv2.medianBlur(img, 3) # Tot i que Canny preprocessa la imatge per defecte (aplica Gaussiana), he vist que posant un filtre de mediana obté millors resultats
