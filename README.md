@@ -31,6 +31,11 @@ gdown 1Zo88NmWoAitO7DnyBrRhKXPcHyMAZS97
 cd ..
 pip install "numpy<1.24" 
 
+## Test colab
+-> Use the notebook lineartanimdata.ipynb
+
+-> Change runtime type : L4 GPU
+
 ## Test
 
 1) Create dir data/scenes/SCENENAME and place footage.mp4 there (already done for the test scene)
@@ -66,8 +71,3 @@ pip install "numpy<1.24"
 ## Test
 
 	python all.py data/scenes/test 
-
-## Test colab
--> Use the notebook lineartanimdata.ipynb
-
--> Change runtime type : L4 GPU
