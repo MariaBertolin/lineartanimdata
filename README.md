@@ -9,6 +9,7 @@ python3.11 -m venv myvenv
 source myvenv/bin/activate
 
 #Install SAM2 and download the checkpoints
+
 cd sam2
 pip install -e .
 cd checkpoints
@@ -16,11 +17,13 @@ cd checkpoints
 cd ../..
 
 #Install other libraries
+
 pip install matplotlib==3.9.2
 pip install opencv-python==3.4.17.61
 pip install numpy==1.26.0
 
 #sketchKeras-pytorch
+
 pip install gdown
 mkdir weights
 cd weights
