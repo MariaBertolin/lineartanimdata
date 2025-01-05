@@ -69,4 +69,5 @@ pip install "numpy<1.24"
 
 ## Test colab
 -> Use the notebook lineartanimdata.ipynb
+
 -> Change runtime type : L4 GPU
