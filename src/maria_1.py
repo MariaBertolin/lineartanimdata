@@ -1,5 +1,5 @@
 import argparse
-from google.colab import output
+# from google.colab import output
 import numpy as np
 import torch
 import cv2
@@ -64,8 +64,8 @@ if __name__ == "__main__":
 
     SCENE_PATH = args.input
 
-    inputpath = SCENE_PATH + "/out_clustercolor" 
-    outputpath = SCENE_PATH + "/out_sketch_fromclustercolor/" 
+    inputpath = os.path.join(SCENE_PATH, "out_clustercolor")
+    outputpath = os.path.join(SCENE_PATH, "out_sketch_fromclustercolor")
     
     if not os.path.exists(outputpath):
        os.makedirs(outputpath)
